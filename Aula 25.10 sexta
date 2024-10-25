@@ -1,0 +1,35 @@
+[HttpGet]
+        public IActionResult Inserir(int ra, String nome, String curso)
+        {
+            SQLiteConnection sqlite_conn;
+            try
+            {
+                sqlite_conn = pegarConexao();
+                sqlite_conn.Open();
+                string sql = $"INSERT INTO aluno (nome,curso) VALUES ('{nome}','{curso}')";
+                SQLiteCommand comandoSQL = new SQLiteCommand(sql, sqlite_conn);
+                comandoSQL.ExecuteNonQuery();
+                int raInserido = Convert.ToInt32(sqlite_conn.LastInsertRowId);
+                sqlite_conn.Close();
+                return Json("Registro inserido com sucesso! RA " + raInserido + " gerado!!!");
+            }
+            catch (Exception ex)
+            {
+                return Json("Não foi possível inserir!!!");
+            }
+        }
+ 
+        public SQLiteConnection pegarConexao()
+        {
+            SQLiteConnection sqlite_conn;
+            String stringConnection = "Data Source=faculdade.db; Version = 3; New = True; Compress = True; ";
+            sqlite_conn = new SQLiteConnection(stringConnection);
+            sqlite_conn.Open();
+            string sql = $"CREATE TABLE IF NOT EXISTS 'aluno'('ra' INTEGER, 'nome' TEXT, 'curso' TEXT, PRIMARY KEY('ra' AUTOINCREMENT))";
+            SQLiteCommand comando = new SQLiteCommand(sql, sqlite_conn);
+            comando.ExecuteNonQuery();
+            sqlite_conn.Close();
+ 
+            return new SQLiteConnection(stringConnection);
+            
+        }
